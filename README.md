@@ -85,3 +85,72 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Building for Android
+
+This project can be packaged as an Android application using Capacitor.
+
+### Prerequisites
+
+- Node.js (version 20.x or later recommended)
+- npm or yarn
+- Android Studio and Android SDK (ensure `ANDROID_SDK_ROOT` environment variable is set, or `local.properties` in the `android` folder points to your SDK).
+- Java Development Kit (JDK) (usually comes with Android Studio)
+
+### Build Steps
+
+1.  **Install Project Dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+2.  **Build the Next.js Web App:**
+    Ensure your `next.config.js` or `next.config.ts` has `output: 'export'` set for static site generation.
+    ```bash
+    npm run build
+    ```
+    This will generate the static web assets in the `out` directory.
+
+3.  **Initialize Capacitor (if not already done):**
+    If this is the first time building for Android or the `capacitor.config.ts` and `android` directory are missing:
+    ```bash
+    # Install Capacitor CLI (if not already a dev dependency)
+    # npm install -D @capacitor/cli @capacitor/core
+    # npm install @capacitor/android
+
+    npx cap init --web-dir=out "Your App Name" "com.example.yourapp"
+    npx cap add android
+    ```
+    Make sure `webDir` in `capacitor.config.ts` is set to `"out"`.
+
+4.  **Sync Web Assets with Android Project:**
+    Every time you make changes to the web app and rebuild it, you need to sync with the Android project:
+    ```bash
+    npx cap sync android
+    ```
+
+5.  **Build the Android App:**
+    Navigate to the Android project directory:
+    ```bash
+    cd android
+    ```
+    Clean and build the debug APK:
+    ```bash
+    ./gradlew clean assembleDebug
+    ```
+    The APK will be located in `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+    For a release build (AAB - Android App Bundle), you would typically run:
+    ```bash
+    ./gradlew bundleRelease
+    ```
+    This requires setting up signing configurations.
+
+### Troubleshooting
+
+-   **SDK Not Found:** Ensure `ANDROID_SDK_ROOT` is set or `android/local.properties` has `sdk.dir=/path/to/your/sdk`.
+-   **License Issues:** Use Android Studio's SDK Manager to accept licenses, or `sdkmanager --licenses` via the command line tools.
+-   **Gradle Errors:** Consult Gradle error messages. Sometimes, cleaning the build (`./gradlew clean`) or syncing files in Android Studio can help.
+-   **Capacitor Cordova Plugins:** If you were using Cordova plugins, the `capacitor-cordova-android-plugins` module might be needed. This guide assumes it's not. If build fails related to it, you might need to uncomment it in `android/settings.gradle` and `android/app/build.gradle` and ensure it's correctly configured.
